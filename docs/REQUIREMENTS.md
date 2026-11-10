@@ -365,11 +365,11 @@ Pengujian Firebase, koneksi, dan tampilan responsif telah dinyatakan selesai ole
 | PowerPoint | Selesai, dikonfirmasi tim; file dikelola terpisah |
 | Chart.js | Diimplementasikan |
 | Export CSV | Diimplementasikan |
-| Public API lokasi | Belum aktif |
+| Public API lokasi | Geoapify terintegrasi; uji API nyata HTTP 200 |
 
 ## Batasan dan Pengembangan Berikutnya
 
-- Pencarian lokasi saat ini menggunakan daftar kampus lokal. Adapter API eksternal sudah tersedia, tetapi provider belum dihubungkan.
+- Pencarian lokasi memakai Geoapify dan daftar kampus lokal. Nama ruangan kecil yang belum tercatat tetap dapat diisi manual.
 - Fetch untuk memuat template HTML tidak dinyatakan sebagai integrasi public API lokasi.
 - Foto barang belum dapat diunggah.
 - Pengajuan klaim dan verifikasi kepemilikan daring belum tersedia.

@@ -63,7 +63,7 @@ HTML utama sudah dipisahkan dari JavaScript ke folder `pages/`:
 
 Edit teks dan susunan elemen langsung di file tersebut. Penanda seperti `{{statistics}}` dan `{{recentReports}}` diisi oleh `js/app.js`; pertahankan nama penanda, ID form, dan atribut `data-*` agar event tetap bekerja. Komponen berulang berada di `pages/components/`.
 
-File halaman adalah **potongan HTML**, bukan dokumen yang dibuka sendiri. Jalankan `npm start`, lalu buka `/#home`, `/#browse`, atau route lain melalui menu. `index.html` tetap menyediakan navbar/footer. Semua template dimuat lewat Fetch dari website yang sama saat aplikasi dimulai; ini terpisah dari bonus API lokasi publik yang belum diaktifkan. Proses pengisian template tidak menggunakan `eval` dan data pengguna tetap di-escape sebelum ditampilkan.
+File halaman adalah **potongan HTML**, bukan dokumen yang dibuka sendiri. Jalankan `npm start`, lalu buka `/#home`, `/#browse`, atau route lain melalui menu. `index.html` tetap menyediakan navbar/footer. Semua template dimuat lewat Fetch dari website yang sama saat aplikasi dimulai; ini terpisah dari integrasi Geoapify untuk pencarian lokasi publik. Proses pengisian template tidak menggunakan `eval` dan data pengguna tetap di-escape sebelum ditampilkan.
 
 ## Aktivasi Firebase
 
@@ -88,11 +88,11 @@ Referensi resmi: [Firebase custom claims](https://firebase.google.com/docs/auth/
 
 ## Pencarian lokasi dan kebijakan API
 
-Versi awal memakai daftar lokasi kampus lokal; nama lokasi dapat diketik manual. Tombol Cari lokasi memanggil adapter Fetch apabila locationEndpoint diisi. Endpoint harus menerima q/format/limit, mendukung CORS, dan mengembalikan array `{display_name, lat?, lon?}`. Jangan memasukkan API secret pada URL di browser; provider yang membutuhkan secret harus dipanggil melalui backend sendiri. Endpoint bisa diganti tanpa mengubah UI.
+Pencarian lokasi terhubung ke Geoapify Forward Geocoding API melalui Fetch. Hasil dibatasi ke Indonesia dan diberi prioritas titik Universitas Klabat, Airmadidi. Daftar gedung lokal tetap tersedia sebagai pelengkap/fallback.
 
-**Bonus public API belum aktif secara langsung sampai provider ditentukan.** Nominatim publik tidak dipasang otomatis. [Kebijakan Nominatim](https://operations.osmfoundation.org/policies/nominatim/) mewajibkan penggunaan ringan maksimal 1 request/detik, identifikasi Referer/User-Agent, atribusi OpenStreetMap, cache, tanpa autocomplete, dan ketentuan khusus penggunaan melalui platform pembuat aplikasi. Pengelola aplikasi harus mengambil keputusan penggunaan secara sadar dan bertanggung jawab atas kepatuhan. Jangan menganggap throttle per browser cukup untuk batas agregat seluruh pengguna.
+Key browser pada `geoapifyKey` di `js/config.js` dibatasi melalui Allowed HTTP Referers di Geoapify. Request hanya berjalan saat tombol ditekan, dibatasi lima hasil, jeda 1,5 detik per browser, timeout 10 detik, serta cache satu hari. Atribusi Geoapify dan OpenStreetMap ditampilkan pada form.
 
-Untuk produksi pilih provider yang mengizinkan penggunaan ini atau self-host/proxy dengan pembatasan global. Tambahkan atribusi provider yang terlihat di UI sebelum aktivasi. Adapter sudah memakai pencarian tombol eksplisit, cache query, jeda 1,5 detik per browser, dan timeout; kontrol agregat dan kebijakan provider tetap perlu di server. Jangan kirim data pribadi ke layanan lokasi.
+Uji API nyata pada 10 November 2026 menghasilkan HTTP 200 dan lokasi Universitas Klabat. Lihat [panduan API lokasi](docs/LOCATION_API.md) untuk konfigurasi dan troubleshooting.
 
 ## Deploy
 
@@ -119,7 +119,7 @@ Sebelum presentasi lakukan uji manual:
 - Persetujuan dosen untuk topik Lost & Found: sudah disetujui (konfirmasi kelompok).
 - Firebase Web App config publik dan UID calon admin; kelompok mengelola akses project sendiri.
 - Repository GitHub dan pilihan Netlify/GitHub Pages agar deployment dapat diselesaikan.
-- Provider lokasi yang diizinkan, endpoint dan atribusinya bila bonus public API akan diaktifkan.
+- Pantau kuota Geoapify dan pertahankan pembatasan HTTP Referer pada key browser.
 - Nama anggota, logo/warna resmi jika ingin dipakai, lokasi kampus yang sudah diverifikasi, serta kontak resmi petugas bila alur klaim akan dikembangkan.
 - Screenshot dari versi akhir dan PowerPoint untuk pengumpulan. Keduanya belum menjadi deliverable dalam versi source awal ini.
 

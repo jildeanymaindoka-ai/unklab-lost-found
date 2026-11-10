@@ -9,7 +9,9 @@ export const config = {
     messagingSenderId: "627215797099",
     appId: "1:627215797099:web:b70b4a95a5dd143bdbda2e",
   },
-  // Endpoint milik sendiri/provider pilihan yang mengembalikan array {display_name,lat,lon}.
+  // Key browser publik: akses dibatasi melalui HTTP Referer di Geoapify.
+  geoapifyKey: "f8f753579e31402086702a08396b45a7",
+  // Endpoint lama tidak dipakai oleh integrasi Geoapify.
   // Nominatim publik tidak diaktifkan otomatis; lihat README tentang kebijakan penggunaan.
   locationEndpoint: "",
 };

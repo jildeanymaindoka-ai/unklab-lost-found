@@ -316,23 +316,37 @@ async function render() {
     // Pencarian lokasi hanya berjalan saat tombol ditekan, bukan saat pengguna mengetik.
     document.querySelector("#find-location").onclick = () =>
       act(async () => {
-        const places = await searchLocations(f.elements.location.value);
-        const target = document.querySelector("#places");
-        target.replaceChildren();
-        document.querySelector("#location-info").textContent = places.length
-          ? `${places.length} lokasi ditemukan`
-          : "Lokasi tidak ditemukan. Anda bisa mengisi manual.";
-        places.slice(0, 5).forEach((p) => {
-          const b = document.createElement("button");
-          b.type = "button";
-          b.className = "secondary";
-          b.textContent = p.display_name;
-          b.onclick = () => {
-            f.elements.location.value = p.display_name.slice(0, 160);
-            target.replaceChildren();
-          };
-          target.append(b);
-        });
+        const searchButton = document.querySelector("#find-location");
+        searchButton.disabled = true;
+        document.querySelector("#location-info").textContent =
+          "Mencari lokasi…";
+        try {
+          const places = await searchLocations(f.elements.location.value);
+          const target = document.querySelector("#places");
+          target.replaceChildren();
+          document.querySelector("#location-info").textContent =
+            places.notice ||
+            (places.length
+              ? `${places.length} lokasi ditemukan`
+              : "Lokasi tidak ditemukan. Anda bisa mengisi manual.");
+          places.slice(0, 5).forEach((p) => {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.className = "secondary";
+            b.textContent = `${p.display_name} · ${p.source || "Lokasi"}`;
+            b.onclick = () => {
+              f.elements.location.value = p.display_name.slice(0, 160);
+              target.replaceChildren();
+            };
+            target.append(b);
+          });
+        } catch (error) {
+          document.querySelector("#places").replaceChildren();
+          document.querySelector("#location-info").textContent = error.message;
+          throw error;
+        } finally {
+          searchButton.disabled = false;
+        }
       });
   } else if (page === "detail") {
     // Detail menampilkan informasi publik dan aksi pemilik/admin.
