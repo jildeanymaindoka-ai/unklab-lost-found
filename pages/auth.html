@@ -1,0 +1,31 @@
+<!-- Tampilan halaman: auth. Penanda kurung ganda diisi oleh js/app.js. -->
+<div class="auth panel">
+  {{pageHeading}}
+  <form id="auth">
+    <label>
+      Email
+      <input
+        name="email"
+        type="email"
+        autocomplete="email"
+        required
+        maxlength="254"
+      />
+    </label>
+    <label>
+      Password
+      <input
+        name="password"
+        type="password"
+        autocomplete="{{passwordAutocomplete}}"
+        minlength="8"
+        required
+      />
+    </label>
+    <button>{{submitLabel}}</button>
+  </form>
+  <p>
+    <a href="#{{alternateRoute}}">{{alternateLabel}}</a>
+  </p>
+  {{demoAccounts}}
+</div>

@@ -1,0 +1,16 @@
+<!-- Komponen bersama: report-card. Penanda kurung ganda diisi oleh js/app.js. -->
+<article class="card">
+  <div class="item-art {{type}}">
+    <span>{{icon}}</span>
+    <small>{{category}}</small>
+  </div>
+  <div class="card-body">
+    <span class="badge {{badgeType}}">{{typeLabel}}</span>
+    <span class="status">{{statusLabel}}</span>
+    <h3>
+      <a href="#detail/{{reportId}}">{{title}}</a>
+    </h3>
+    <p>⌖ {{location}}</p>
+    <p class="muted">{{date}}</p>
+  </div>
+</article>

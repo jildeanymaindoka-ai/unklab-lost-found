@@ -1,0 +1,26 @@
+<!-- Tampilan halaman: dashboard. Penanda kurung ganda diisi oleh js/app.js. -->
+<div class="actions">
+  <a class="button" href="#report">+ Buat laporan</a>
+  {{adminLink}}
+  <button id="export" class="secondary">Export CSV</button>
+</div>
+<div class="dashboard-grid">
+  <section class="panel">
+    <h2>Ringkasan laporan</h2>
+    <div class="chart">
+      <canvas
+        id="chart"
+        aria-label="Grafik jumlah laporan per status"
+        role="img"
+      ></canvas>
+    </div>
+    <p>
+      {{totalReports}} laporan · {{pendingReports}} menunggu ·
+      {{returnedReports}} dikembalikan
+    </p>
+  </section>
+  <section class="panel">
+    <h2>{{listTitle}}</h2>
+    {{reportRows}}
+  </section>
+</div>

@@ -28,8 +28,11 @@ Beranda, pencarian dengan filter tersimpan, detail laporan, login, registrasi, f
 
 ```text
 index.html              shell HTML semantik
+pages/                  template HTML setiap tampilan
+pages/components/       kartu, judul, pilihan form, dan tombol bersama
 assets/styles.css       token desain dan layout responsif
 js/app.js               routing hash, DOM, form, event, dashboard
+js/templates.js         memuat HTML dan mengisi penanda data
 js/model.js             model, data contoh, filter, validasi, CSV
 js/store.js             adapter demo/Firebase dan pemeriksaan akses UI
 js/firebase.js          Authentication dan Firestore
@@ -43,6 +46,24 @@ docs/REQUIREMENTS.md    pemetaan ketentuan dan pekerjaan akhir
 ```
 
 Ubah warna di :root pada CSS dan data kategori/lokasi di model.js. Tidak ada foto kampus atau logo resmi yang diasumsikan tersedia. Google Fonts dan Chart.js memakai CDN; tanpa internet font fallback dan ringkasan angka tetap tersedia. Firebase mode memerlukan internet.
+
+### Mengedit HTML halaman
+
+HTML utama sudah dipisahkan dari JavaScript ke folder `pages/`:
+
+| File | Tampilan |
+|---|---|
+| `pages/home.html` | Beranda |
+| `pages/browse.html` | Pencarian dan filter |
+| `pages/auth.html` | Login dan registrasi memakai satu form bersama |
+| `pages/report.html` | Tambah dan edit laporan |
+| `pages/detail.html` | Detail laporan |
+| `pages/dashboard.html` | Dashboard user dan pengelolaan admin |
+| `pages/help.html` | Panduan |
+
+Edit teks dan susunan elemen langsung di file tersebut. Penanda seperti `{{statistics}}` dan `{{recentReports}}` diisi oleh `js/app.js`; pertahankan nama penanda, ID form, dan atribut `data-*` agar event tetap bekerja. Komponen berulang berada di `pages/components/`.
+
+File halaman adalah **potongan HTML**, bukan dokumen yang dibuka sendiri. Jalankan `npm start`, lalu buka `/#home`, `/#browse`, atau route lain melalui menu. `index.html` tetap menyediakan navbar/footer. Semua template dimuat lewat Fetch dari website yang sama saat aplikasi dimulai; ini terpisah dari bonus API lokasi publik yang belum diaktifkan. Proses pengisian template tidak menggunakan `eval` dan data pengguna tetap di-escape sebelum ditampilkan.
 
 ## Aktivasi Firebase
 

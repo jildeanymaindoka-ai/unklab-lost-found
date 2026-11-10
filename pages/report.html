@@ -1,0 +1,66 @@
+<!-- Tampilan halaman: report. Penanda kurung ganda diisi oleh js/app.js. -->
+<form id="report-form" class="panel report-form">
+  <div class="form-grid">
+    <label>
+      Jenis laporan
+      <select name="type" required>
+        <option value="lost">Barang hilang</option>
+        <option value="found">Barang ditemukan</option>
+      </select>
+    </label>
+    <label>
+      Kategori
+      <select name="category">
+        {{categoryOptions}}
+      </select>
+    </label>
+    <label>
+      Nama barang
+      <input
+        name="title"
+        required
+        minlength="4"
+        maxlength="100"
+        placeholder="Contoh: Headphone hitam"
+      />
+    </label>
+    <label>
+      Tanggal kejadian
+      <input name="date" type="date" required />
+    </label>
+    <label>
+      Lokasi
+      <input
+        name="location"
+        list="campus"
+        required
+        maxlength="160"
+        placeholder="Contoh: Perpustakaan"
+      />
+      <datalist id="campus">{{locationOptions}}</datalist>
+    </label>
+  </div>
+  <button type="button" id="find-location" class="secondary">
+    Cari lokasi
+  </button>
+  <p id="location-info" aria-live="polite">
+    Daftar lokasi kampus lokal tersedia. Integrasi API mengikuti konfigurasi.
+  </p>
+  <div id="places"></div>
+  <label>
+    Deskripsi
+    <textarea
+      name="description"
+      required
+      minlength="10"
+      maxlength="2000"
+      rows="5"
+      placeholder="Jelaskan ciri umum barang dan perkiraan lokasi."
+    ></textarea>
+  </label>
+  <p>Laporan baru dan perubahan akan menunggu verifikasi admin.</p>
+  <div class="actions">
+    <button>Simpan laporan</button>
+    <a href="#dashboard">Batal</a>
+  </div>
+</form>

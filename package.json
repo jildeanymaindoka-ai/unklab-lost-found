@@ -1,1 +1,9 @@
-{"name":"unklab-lost-found","private":true,"type":"module","scripts":{"start":"node scripts/serve.mjs","test":"node --test tests/*.test.mjs"}}
+{
+  "name": "unklab-lost-found",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

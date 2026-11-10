@@ -1,29 +1,81 @@
 rules_version = '2';
+// Aturan database menjadi pengaman utama, terlepas dari pemeriksaan pada antarmuka.
 service cloud.firestore {
- match /databases/{database}/documents {
-  function signedIn() { return request.auth != null; }
-  function admin() { return signedIn() && request.auth.token.admin == true; }
-  function valid(d) {
-   return d.keys().hasAll(['title','type','category','location','date','description','ownerId','createdAt','status'])
-    && d.keys().hasOnly(['title','type','category','location','date','description','ownerId','createdAt','status'])
-    && d.title is string && d.title.size() >= 4 && d.title.size() <= 100
-    && d.type in ['lost','found']
-    && d.category in ['Elektronik','Kartu & Identitas','Tas & Dompet','Buku & Alat tulis','Aksesori','Lainnya']
-    && d.location is string && d.location.size() > 0 && d.location.size() <= 160
-    && d.date is string && d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
-    && d.description is string && d.description.size() >= 10 && d.description.size() <= 2000
-    && d.ownerId is string && d.createdAt is number
-    && d.status in ['pending','verified','returned'];
+  match /databases/{database}/documents {
+    // Pengguna harus memiliki sesi Firebase Authentication yang valid.
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Hak admin hanya dipercaya dari custom claim yang diberikan lewat Admin SDK.
+    function admin() {
+      return signedIn()
+        && request.auth.token.admin == true;
+    }
+
+    // Batasi field, tipe, panjang, kategori, serta status laporan yang disimpan.
+    function valid(d) {
+      return d.keys().hasAll([
+          'title', 'type', 'category', 'location', 'date',
+          'description', 'ownerId', 'createdAt', 'status'
+        ])
+        && d.keys().hasOnly([
+          'title', 'type', 'category', 'location', 'date',
+          'description', 'ownerId', 'createdAt', 'status'
+        ])
+        && d.title is string
+        && d.title.size() >= 4
+        && d.title.size() <= 100
+
+        && d.type in ['lost', 'found']
+        && d.category in [
+          'Elektronik', 'Kartu & Identitas', 'Tas & Dompet',
+          'Buku & Alat tulis', 'Aksesori', 'Lainnya'
+        ]
+
+        && d.location is string
+        && d.location.size() > 0
+        && d.location.size() <= 160
+
+        && d.date is string
+        && d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+
+        && d.description is string
+        && d.description.size() >= 10
+        && d.description.size() <= 2000
+
+        && d.ownerId is string
+        && d.createdAt is number
+
+        && d.status in ['pending', 'verified', 'returned'];
+    }
+
+    match /reports/{id} {
+      // Laporan bersifat publik; jangan simpan identitas atau informasi rahasia di sini.
+      allow read: if true;
+
+      // Laporan baru harus dimiliki pembuatnya dan berstatus pending.
+      allow create: if signedIn()
+        && valid(request.resource.data)
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.status == 'pending';
+
+      // Pemilik tidak bisa mengganti owner/waktu awal atau memverifikasi laporan sendiri.
+      allow update: if signedIn()
+        && valid(request.resource.data)
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && (admin() || (resource.data.ownerId == request.auth.uid
+          && request.resource.data.status == 'pending'));
+
+      // Pemilik dan admin diperbolehkan menghapus laporan.
+      allow delete: if signedIn()
+        && (admin() || resource.data.ownerId == request.auth.uid);
+    }
+
+    // Semua collection lain ditolak sampai ada aturan khusus.
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
-  match /reports/{id} {
-   allow read: if true;
-   allow create: if signedIn() && valid(request.resource.data) && request.resource.data.ownerId == request.auth.uid && request.resource.data.status == 'pending';
-   allow update: if signedIn() && valid(request.resource.data)
-    && request.resource.data.ownerId == resource.data.ownerId
-    && request.resource.data.createdAt == resource.data.createdAt
-    && (admin() || (resource.data.ownerId == request.auth.uid && request.resource.data.status == 'pending'));
-   allow delete: if signedIn() && (admin() || resource.data.ownerId == request.auth.uid);
-  }
-  match /{document=**} { allow read, write: if false; }
- }
 }

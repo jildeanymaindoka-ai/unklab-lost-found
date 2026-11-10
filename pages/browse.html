@@ -1,0 +1,31 @@
+<!-- Tampilan halaman: browse. Penanda kurung ganda diisi oleh js/app.js. -->
+<form id="filters" class="filters">
+  <label>
+    Kata kunci
+    <input name="q" placeholder="Nama barang atau lokasi..." />
+  </label>
+  <label>
+    Jenis
+    <select name="type">
+      <option value="">Semua jenis</option>
+      <option value="lost">Hilang</option>
+      <option value="found">Ditemukan</option>
+    </select>
+  </label>
+  <label>
+    Kategori
+    <select name="category">
+      <option value="">Semua kategori</option>
+      {{categoryOptions}}
+    </select>
+  </label>
+  <label>
+    Status
+    <select name="status">
+      <option value="">Semua status</option>
+      {{statusOptions}}
+    </select>
+  </label>
+</form>
+<p id="count" aria-live="polite"></p>
+<div id="results"></div>
