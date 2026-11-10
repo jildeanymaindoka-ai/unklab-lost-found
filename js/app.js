@@ -11,7 +11,7 @@ function grid(rs){return rs.length?`<div class="grid">${rs.map(card).join('')}</
 function heading(k,t,p=''){return `<div class="page-heading"><span class="eyebrow">${k}</span><h1>${t}</h1><p>${p}</p></div>`;}
 function authRequired(){main.innerHTML=heading('AKUN','Masuk untuk melanjutkan','Kelola laporan dan bantu barang kembali ke pemiliknya.')+'<a class="button" href="#login">Masuk ke akun</a>';}
 async function render(){
- chart?.destroy();const [page='home',id]=location.hash.slice(1).split('/');
+ chart?.destroy();const [page,id]=(location.hash.slice(1)||'home').split('/');
  try{rows=await store.list();}catch(e){main.innerHTML=heading('KONEKSI','Data belum dapat dimuat',esc(e.message));return;}
  document.querySelector('#account').textContent=store.user?'Keluar':'Masuk';document.querySelector('#account').href=store.user?'#logout':'#login';
  document.querySelector('#mode').textContent=store.demo?'Mode demo · Data tersimpan di browser ini · Akun demo bukan akun Firebase':'Terhubung ke Firebase';
