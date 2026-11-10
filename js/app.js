@@ -4,6 +4,7 @@ import { template, loadTemplates, templatesReady } from "./templates.js";
 import { store } from "./store.js";
 import { categories, locations, icons, filterReports, csv } from "./model.js";
 import { searchLocations } from "./locations.js";
+import { preparePhoto, safePhoto } from "./photos.js";
 // Ubah karakter khusus pada data pengguna sebelum dimasukkan ke HTML untuk mencegah injeksi markup.
 const main = document.querySelector("main"),
   esc = (s) =>
@@ -40,6 +41,15 @@ function toast(s) {
 // Satu komponen kartu dipakai kembali pada beranda, pencarian, dan detail.
 function card(r) {
   return template("components/report-card", {
+    photoContent: safePhoto(r.photo)
+      ? template("components/report-photo", {
+          photo: r.photo,
+          title: esc(r.title),
+        })
+      : template("components/report-icon", {
+          icon: icons[r.category] || "◇",
+          category: esc(r.category),
+        }),
     type: r.type,
     icon: icons[r.category] || "◇",
     category: esc(r.category),
@@ -218,6 +228,55 @@ async function render() {
         locationOptions: opts(locations),
       });
     const f = document.querySelector("#report-form");
+    const photoFile = document.querySelector("#photo-file");
+    const preview = document.querySelector("#photo-preview");
+    const photoImage = document.querySelector("#photo-image");
+    const photoStatus = document.querySelector("#photo-status");
+    const submit = f.querySelector('[type="submit"]');
+    let photoChange,
+      processing = false,
+      photoVersion = 0;
+    const showPhoto = (photo) => {
+      preview.hidden = !photo;
+      if (photo) photoImage.src = photo;
+      else photoImage.removeAttribute("src");
+    };
+    showPhoto(safePhoto(r?.photo));
+    // Versi mencegah proses foto lama menimpa pilihan terbaru setelah penghapusan.
+    photoFile.onchange = async () => {
+      const file = photoFile.files[0];
+      if (!file) return;
+      const version = ++photoVersion;
+      processing = true;
+      submit.disabled = true;
+      photoStatus.textContent = "Memproses foto…";
+      try {
+        const photo = await preparePhoto(file);
+        if (version !== photoVersion) return;
+        photoChange = photo;
+        showPhoto(photo);
+        photoStatus.textContent = "Foto siap disimpan.";
+      } catch (error) {
+        if (version !== photoVersion) return;
+        photoFile.value = "";
+        photoStatus.textContent =
+          error.message + " Foto sebelumnya tetap dipertahankan.";
+      } finally {
+        if (version === photoVersion) {
+          processing = false;
+          submit.disabled = false;
+        }
+      }
+    };
+    document.querySelector("#remove-photo").onclick = () => {
+      photoVersion++;
+      photoChange = "";
+      processing = false;
+      photoFile.value = "";
+      submit.disabled = false;
+      showPhoto("");
+      photoStatus.textContent = "Foto akan dihapus saat laporan disimpan.";
+    };
     f.elements.date.max = new Date().toLocaleDateString("en-CA");
     if (r)
       for (const k of [
@@ -232,10 +291,26 @@ async function render() {
     // FormData menjadi objek laporan, lalu store memvalidasi dan menyimpannya.
     f.onsubmit = (e) => {
       e.preventDefault();
+      if (processing || submit.disabled) return;
+      submit.disabled = true;
+      photoFile.disabled = true;
+      document.querySelector("#remove-photo").disabled = true;
+      submit.textContent = "Menyimpan…";
       act(async () => {
-        await store.save(Object.fromEntries(new FormData(f)), id);
-        toast("Laporan berhasil disimpan.");
-        location.hash = "dashboard";
+        try {
+          await store.save(
+            Object.fromEntries(new FormData(f)),
+            id,
+            photoChange,
+          );
+          toast("Laporan berhasil disimpan.");
+          location.hash = "dashboard";
+        } finally {
+          submit.disabled = false;
+          submit.textContent = "Simpan laporan";
+          photoFile.disabled = false;
+          document.querySelector("#remove-photo").disabled = false;
+        }
       });
     };
     // Pencarian lokasi hanya berjalan saat tombol ditekan, bukan saat pengguna mengetik.

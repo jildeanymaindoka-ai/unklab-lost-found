@@ -1,6 +1,7 @@
 // Lapisan penyimpanan: UI menggunakan API yang sama untuk demo dan Firebase.
 import { config } from "./config.js";
 import { seed, validateReport } from "./model.js";
+import { safePhoto } from "./photos.js";
 const key = "unklab-reports-v1";
 // JSON lokal bisa rusak atau tidak tersedia; gunakan nilai cadangan jika pembacaan gagal.
 function read(k, fallback) {
@@ -58,9 +59,15 @@ export const store = {
     localStorage.removeItem("unklab-demo-user");
   },
   // Validasi dijalankan sebelum menyimpan. Edit laporan mengembalikan status ke pending.
-  async save(data, id) {
+  async save(data, id, photoChange) {
     if (!user) throw Error("Silakan masuk terlebih dahulu.");
     validateReport(data);
+    // undefined mempertahankan foto lama; string kosong berarti hapus foto.
+    if (photoChange !== undefined) {
+      if (photoChange !== "" && !safePhoto(photoChange))
+        throw Error("Foto tidak valid atau terlalu besar.");
+      data = { ...data, photo: photoChange };
+    }
     if (!this.demo) return fb.save(data, id);
     const old = rows.find((r) => r.id === id);
     if (id && !old) throw Error("Laporan tidak ditemukan.");
@@ -68,14 +75,24 @@ export const store = {
       throw Error("Tidak memiliki akses.");
     // Pemilik dan waktu pembuatan dipertahankan ketika laporan diedit.
     const next = {
+      ...(old || {}),
       ...data,
       id: id || crypto.randomUUID(),
       ownerId: old?.ownerId || user.uid,
       createdAt: old?.createdAt || Date.now(),
       status: "pending",
     };
-    rows = id ? rows.map((r) => (r.id === id ? next : r)) : [next, ...rows];
-    localStorage.setItem(key, JSON.stringify(rows));
+    const updated = id
+      ? rows.map((r) => (r.id === id ? next : r))
+      : [next, ...rows];
+    try {
+      localStorage.setItem(key, JSON.stringify(updated));
+    } catch {
+      throw Error(
+        "Penyimpanan browser penuh. Hapus beberapa foto/laporan demo atau gunakan Firebase.",
+      );
+    }
+    rows = updated;
   },
   // Mode Firebase menyerahkan penegakan izin penghapusan kepada Security Rules.
   async remove(id) {

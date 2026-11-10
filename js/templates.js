@@ -2,6 +2,8 @@
 const names = [
   "components/option",
   "components/report-card",
+  "components/report-photo",
+  "components/report-icon",
   "components/report-grid",
   "components/empty-results",
   "components/heading",

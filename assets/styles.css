@@ -1,4 +1,34 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+/* Foto ditampilkan tanpa mengubah ukuran kartu dan dapat diperiksa lebih besar di detail. */
+.report-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-preview {
+  margin: 16px 0;
+}
+.photo-preview[hidden] {
+  display: none;
+}
+.photo-preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.detail .item-art:has(.report-photo) {
+  height: auto;
+}
+.detail .report-photo {
+  max-height: 450px;
+  object-fit: contain;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
 /* Token desain: ubah warna di sini agar seluruh halaman tetap konsisten. */
 :root {
   --ink: #243d33;

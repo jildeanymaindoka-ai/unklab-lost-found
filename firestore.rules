@@ -21,7 +21,7 @@ service cloud.firestore {
         ])
         && d.keys().hasOnly([
           'title', 'type', 'category', 'location', 'date',
-          'description', 'ownerId', 'createdAt', 'status'
+          'description', 'ownerId', 'createdAt', 'status', 'photo'
         ])
         && d.title is string
         && d.title.size() >= 4
@@ -47,7 +47,10 @@ service cloud.firestore {
         && d.ownerId is string
         && d.createdAt is number
 
-        && d.status in ['pending', 'verified', 'returned'];
+        && d.status in ['pending', 'verified', 'returned']
+        // Foto opsional; hanya JPEG hasil kompresi dan maksimal sekitar 260 KB teks.
+        && (!('photo' in d) || (d.photo is string && d.photo.size() <= 260000
+          && (d.photo == '' || d.photo.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$'))));
     }
 
     match /reports/{id} {

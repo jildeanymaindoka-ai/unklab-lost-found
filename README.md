@@ -22,7 +22,7 @@ Beranda, pencarian dengan filter tersimpan, detail laporan, login, registrasi, f
 - Hak akses pemilik dan admin; laporan baru/perubahan berstatus pending, admin memverifikasi dan menandai returned setelah pemeriksaan langsung.
 - Dashboard dengan Chart.js dan ringkasan angka sebagai fallback; CSV dengan BOM UTF-8, escaping, serta proteksi formula spreadsheet.
 - Layout Grid/Flexbox responsif, label form, skip link, focus ring, dan notifikasi aria-live.
-- Adapter Firebase siap dikonfigurasi. Foto/upload, klaim daring, dan kontak petugas belum tersedia. Jangan menaruh kontak pribadi di laporan publik.
+- Upload satu foto per laporan: JPG, PNG, atau WebP maksimal 5 MB, dikompresi menjadi JPEG maksimal 180 KiB dan disimpan di Firestore. Foto bisa diganti/dihapus saat edit. Lihat [panduan aktivasi foto](docs/PHOTO_UPLOAD.md); rules terbaru harus dipublikasikan. Klaim daring dan kontak petugas belum tersedia. Jangan menaruh kontak pribadi di laporan publik.
 
 ## Struktur
 
