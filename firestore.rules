@@ -21,7 +21,7 @@ service cloud.firestore {
         ])
         && d.keys().hasOnly([
           'title', 'type', 'category', 'location', 'date',
-          'description', 'ownerId', 'createdAt', 'status', 'photo'
+          'description', 'ownerId', 'createdAt', 'status', 'photo', 'ownerName'
         ])
         && d.title is string
         && d.title.size() >= 4
@@ -45,6 +45,7 @@ service cloud.firestore {
         && d.description.size() <= 2000
 
         && d.ownerId is string
+        && (!('ownerName' in d) || (d.ownerName is string && d.ownerName.size() >= 2 && d.ownerName.size() <= 60))
         && d.createdAt is number
 
         && d.status in ['pending', 'verified', 'returned']
@@ -61,6 +62,9 @@ service cloud.firestore {
       allow create: if signedIn()
         && valid(request.resource.data)
         && request.resource.data.ownerId == request.auth.uid
+        // Nama dari Authentication; tidak boleh mengaku sebagai akun lain melalui form.
+        && (!('ownerName' in request.resource.data) || request.resource.data.ownerName ==
+          (request.auth.token.get('name', '') == '' ? 'Pengguna UNKLAB' : request.auth.token.name))
         && request.resource.data.status == 'pending';
 
       // Pemilik tidak bisa mengganti owner/waktu awal atau memverifikasi laporan sendiri.
@@ -68,6 +72,8 @@ service cloud.firestore {
         && valid(request.resource.data)
         && request.resource.data.ownerId == resource.data.ownerId
         && request.resource.data.createdAt == resource.data.createdAt
+        // Nama pelapor pada laporan adalah snapshot saat dibuat dan tidak ikut berubah saat admin mengedit.
+        && request.resource.data.get('ownerName', '') == resource.data.get('ownerName', '')
         && (admin() || (resource.data.ownerId == request.auth.uid
           && request.resource.data.status == 'pending'));
 

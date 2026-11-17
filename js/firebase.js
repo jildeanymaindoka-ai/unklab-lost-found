@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   getIdTokenResult,
+  updateProfile,
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 import {
   getFirestore,
@@ -32,6 +33,7 @@ export async function init(callback) {
     callback({
       uid: u.uid,
       email: u.email,
+      displayName: u.displayName || "",
       admin: token.claims.admin === true,
     });
   });
@@ -43,6 +45,19 @@ export async function login(email, password, register) {
   )(auth, email, password);
 }
 export const logout = () => signOut(auth);
+// Perbarui profil Authentication dan token agar nama pelapor bisa diverifikasi Rules.
+export async function saveProfile(displayName) {
+  const u = auth.currentUser;
+  if (!u) throw Error("Silakan masuk terlebih dahulu.");
+  await updateProfile(u, { displayName });
+  const token = await getIdTokenResult(u, true);
+  return {
+    uid: u.uid,
+    email: u.email,
+    displayName: u.displayName,
+    admin: token.claims.admin === true,
+  };
+}
 // Baca collection reports dan urutkan dari laporan terbaru di sisi browser.
 export async function list() {
   const s = await getDocs(collection(db, "reports"));
@@ -58,6 +73,7 @@ export async function save(data, id) {
   return setDoc(ref, {
     ...data,
     ownerId: auth.currentUser.uid,
+    ownerName: auth.currentUser.displayName || "Pengguna UNKLAB",
     createdAt: Date.now(),
     status: "pending",
   });

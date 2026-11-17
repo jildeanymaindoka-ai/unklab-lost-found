@@ -5,6 +5,7 @@ import { store } from "./store.js";
 import { categories, locations, icons, filterReports, csv } from "./model.js";
 import { searchLocations } from "./locations.js";
 import { preparePhoto, safePhoto } from "./photos.js";
+import { reporterName } from "./profile.js";
 // Ubah karakter khusus pada data pengguna sebelum dimasukkan ke HTML untuk mencegah injeksi markup.
 const main = document.querySelector("main"),
   esc = (s) =>
@@ -95,7 +96,9 @@ async function render() {
   chart?.destroy();
   const [page, id] = (location.hash.slice(1) || "home").split("/");
   try {
-    rows = await store.list();
+    // Halaman akun dan panduan tetap bisa dibuka saat pembacaan laporan gagal.
+    if (!["profile", "login", "register", "logout", "help"].includes(page))
+      rows = await store.list();
   } catch (e) {
     main.innerHTML = heading(
       "KONEKSI",
@@ -108,6 +111,7 @@ async function render() {
     ? "Keluar"
     : "Masuk";
   document.querySelector("#account").href = store.user ? "#logout" : "#login";
+  document.querySelector("#profile-link").hidden = !store.user;
   document.querySelector("#mode").textContent = store.demo
     ? "Mode demo · Data tersimpan di browser ini · Akun demo bukan akun Firebase"
     : "Terhubung ke Firebase";
@@ -120,7 +124,35 @@ async function render() {
     return;
   }
   // Beranda menampilkan ringkasan seluruh laporan dan enam laporan terbaru.
-  if (page === "home") {
+  if (page === "profile") {
+    if (!store.user) return authRequired();
+    main.innerHTML =
+      heading(
+        "AKUN SAYA",
+        "Profil pengguna",
+        "Kelola nama yang ditampilkan pada laporan.",
+      ) +
+      template("profile", {
+        email: esc(store.user.email),
+        role: store.user.admin ? "Admin" : "User",
+        displayName: esc(store.user.displayName || ""),
+      });
+    document.querySelector("#profile-form").onsubmit = (event) => {
+      event.preventDefault();
+      const form = event.currentTarget,
+        button = form.querySelector("button");
+      button.disabled = true;
+      act(async () => {
+        try {
+          await store.saveProfile(new FormData(form).get("displayName"));
+          toast("Profil berhasil disimpan.");
+          await render();
+        } finally {
+          button.disabled = false;
+        }
+      });
+    };
+  } else if (page === "home") {
     main.innerHTML = template("home", {
       statistics: [
         ["Semua laporan", rows.length],
@@ -356,6 +388,7 @@ async function render() {
       return;
     }
     main.innerHTML = template("detail", {
+      reporterName: esc(reporterName(r)),
       content: card(r),
       content2: heading(labels[r.type], esc(r.title)),
       description: esc(r.description),
@@ -385,6 +418,7 @@ async function render() {
         "Pantau laporan dan bantu proses pengembalian barang.",
       ) +
       template("dashboard", {
+        profileName: esc(store.user.displayName || "Pengguna UNKLAB"),
         adminLink: store.user.admin ? template("components/admin-link") : "",
         totalReports: visible.length,
         pendingReports: visible.filter((r) => r.status === "pending").length,

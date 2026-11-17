@@ -13,6 +13,7 @@ const names = [
   "browse",
   "components/status-option",
   "auth",
+  "profile",
   "components/demo-accounts",
   "report",
   "detail",

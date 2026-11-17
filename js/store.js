@@ -2,6 +2,7 @@
 import { config } from "./config.js";
 import { seed, validateReport } from "./model.js";
 import { safePhoto } from "./photos.js";
+import { validateDisplayName } from "./profile.js";
 const key = "unklab-reports-v1";
 // JSON lokal bisa rusak atau tidak tersedia; gunakan nilai cadangan jika pembacaan gagal.
 function read(k, fallback) {
@@ -50,6 +51,10 @@ export const store = {
       uid: admin ? "demo-admin" : "demo-user",
       email: admin ? "admin@demo.local" : "user@demo.local",
       admin,
+      displayName: read(
+        "unklab-demo-profile:" + (admin ? "demo-admin" : "demo-user"),
+        "",
+      ),
     };
     localStorage.setItem("unklab-demo-user", JSON.stringify(user));
   },
@@ -57,6 +62,21 @@ export const store = {
     if (!this.demo) await fb.logout();
     user = null;
     localStorage.removeItem("unklab-demo-user");
+  },
+  async saveProfile(value) {
+    if (!user) throw Error("Silakan masuk terlebih dahulu.");
+    const displayName = validateDisplayName(value);
+    if (!this.demo) {
+      user = await fb.saveProfile(displayName);
+      return;
+    }
+    const updated = { ...user, displayName };
+    localStorage.setItem(
+      "unklab-demo-profile:" + user.uid,
+      JSON.stringify(displayName),
+    );
+    localStorage.setItem("unklab-demo-user", JSON.stringify(updated));
+    user = updated;
   },
   // Validasi dijalankan sebelum menyimpan. Edit laporan mengembalikan status ke pending.
   async save(data, id, photoChange) {
@@ -79,6 +99,11 @@ export const store = {
       ...data,
       id: id || crypto.randomUUID(),
       ownerId: old?.ownerId || user.uid,
+      ownerName:
+        old?.ownerName ||
+        (old && old.ownerId !== user.uid
+          ? "Pengguna UNKLAB"
+          : user.displayName || "Pengguna UNKLAB"),
       createdAt: old?.createdAt || Date.now(),
       status: "pending",
     };

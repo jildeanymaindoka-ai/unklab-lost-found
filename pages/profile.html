@@ -1,0 +1,29 @@
+<!-- Data akun hanya ditampilkan untuk pengguna yang sedang masuk. -->
+<section class="panel profile-panel">
+  <h2>Akun saya</h2>
+  <p>
+    Email:
+    <strong>{{email}}</strong>
+  </p>
+  <p>Peran: {{role}}</p>
+  <form id="profile-form">
+    <label>
+      Nama tampilan
+      <input
+        name="displayName"
+        value="{{displayName}}"
+        required
+        minlength="2"
+        maxlength="60"
+        autocomplete="nickname"
+        aria-describedby="profile-note"
+      />
+    </label>
+    <p id="profile-note">
+      Nama ini ditampilkan sebagai pelapor pada laporan baru. Gunakan nama yang
+      boleh dilihat publik. Email tidak ditampilkan pada laporan.
+    </p>
+    <button type="submit">Simpan profil</button>
+  </form>
+  <p><a href="#dashboard">Lihat laporan saya →</a></p>
+</section>
