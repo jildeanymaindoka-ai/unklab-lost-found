@@ -1,25 +1,47 @@
 <!-- Tampilan halaman: help. Penanda kurung ganda diisi oleh js/app.js. -->
-<section class="panel prose">
-  <h2>Bagaimana cara kerjanya?</h2>
-  <ol>
-    <li>Cari barang berdasarkan nama, kategori, lokasi, atau status.</li>
-    <li>Masuk dan buat laporan barang hilang atau ditemukan.</li>
-    <li>
-      Admin memverifikasi laporan dan menandai pengembalian setelah pengecekan
-      langsung.
-    </li>
-  </ol>
-  <h2>Privasi dan keamanan</h2>
-  <p>
-    Laporan dapat dibaca publik. Jangan unggah identitas, nomor rekening, kontak
-    pribadi, atau ciri rahasia untuk membuktikan kepemilikan. Penyerahan barang
-    sebaiknya dilakukan bersama petugas kampus.
-  </p>
-  <h2>Tentang versi ini</h2>
-  <p>
-    Demo menyimpan laporan dan sesi simulasi di Local Storage browser. Gunakan
-    data fiktif. Mode Firebase menggunakan Authentication dan Firestore dengan
-    hak akses admin melalui custom claims.
-  </p>
-  <p>Setiap laporan dapat dilengkapi satu foto JPG, PNG, atau WebP maksimal 5 MB. Foto diperkecil sebelum disimpan dan dapat dilihat publik. Alur klaim daring belum tersedia.</p>
-</section>
+<div class="help-layout">
+  <section class="panel prose">
+    <h2>Bagaimana cara kerjanya?</h2>
+    <ol>
+      <li>Cari barang berdasarkan nama, kategori, lokasi, atau status.</li>
+      <li>Masuk dan buat laporan barang hilang atau ditemukan.</li>
+      <li>
+        Admin memverifikasi laporan dan menandai pengembalian setelah pengecekan
+        langsung.
+      </li>
+    </ol>
+    <h2>Privasi dan keamanan</h2>
+    <p>
+      Laporan dapat dibaca publik. Jangan unggah identitas, nomor rekening,
+      kontak pribadi, atau ciri rahasia untuk membuktikan kepemilikan.
+      Penyerahan barang sebaiknya dilakukan bersama petugas kampus.
+    </p>
+    <h2>Tentang versi ini</h2>
+    <p>
+      Demo menyimpan laporan dan sesi simulasi di Local Storage browser. Gunakan
+      data fiktif. Mode Firebase menggunakan Authentication dan Firestore dengan
+      hak akses admin melalui custom claims.
+    </p>
+    <p>
+      Setiap laporan dapat dilengkapi satu foto JPG, PNG, atau WebP maksimal 5
+      MB. Foto diperkecil sebelum disimpan dan dapat dilihat publik. Alur klaim
+      daring belum tersedia.
+    </p>
+  </section>
+  <aside class="tips" aria-label="Arti status laporan">
+    <span class="eyebrow">ARTI STATUS</span>
+    <h2>Membaca label</h2>
+    <dl class="status-list">
+      <dt><span class="badge lost">Hilang</span></dt>
+      <dd>Pemilik sedang mencari barang ini.</dd>
+      <dt><span class="badge">Ditemukan</span></dt>
+      <dd>Seseorang menemukan dan melaporkannya.</dd>
+      <dt>Menunggu verifikasi</dt>
+      <dd>Laporan baru atau baru diedit, belum dicek admin.</dd>
+      <dt>Terverifikasi</dt>
+      <dd>Sudah dicek admin dan tampil untuk umum.</dd>
+      <dt>Dikembalikan</dt>
+      <dd>Barang sudah kembali ke pemiliknya.</dd>
+    </dl>
+  </aside>
+</div>

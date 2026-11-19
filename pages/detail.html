@@ -1,16 +1,21 @@
 <!-- Tampilan halaman: detail. Penanda kurung ganda diisi oleh js/app.js. -->
 <a href="#browse">← Kembali ke pencarian</a>
 <div class="detail">
-  {{content}}
+  <div class="detail-side">
+    {{content}}
+    <ol class="timeline" aria-label="Tahapan laporan">
+      {{statusSteps}}
+    </ol>
+  </div>
   <section class="panel">
     {{content2}}
     <p class="description">{{description}}</p>
     <p>Lokasi: {{location}} · {{date}}</p>
-    <p>Status: {{content3}}</p>
     <p>
       Dilaporkan oleh:
       <strong>{{reporterName}}</strong>
     </p>
+    <p>Status: {{content3}}</p>
     <div class="notice">
       Merasa ini barangmu? Hubungi petugas kampus melalui jalur resmi yang sudah
       kamu kenal. Buktikan kepemilikan dengan ciri khusus; jangan membagikan

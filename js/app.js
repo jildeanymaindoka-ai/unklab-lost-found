@@ -5,6 +5,7 @@ import { store } from "./store.js";
 import { categories, locations, icons, filterReports, csv } from "./model.js";
 import { searchLocations } from "./locations.js";
 import { preparePhoto, safePhoto } from "./photos.js";
+import { startOrbit } from "./orbit.js";
 import { reporterName } from "./profile.js";
 // Ubah karakter khusus pada data pengguna sebelum dimasukkan ke HTML untuk mencegah injeksi markup.
 const main = document.querySelector("main"),
@@ -21,6 +22,7 @@ const main = document.querySelector("main"),
         })[c],
     );
 // Data laporan dan instance grafik yang sedang ditampilkan.
+let stopOrbit = () => {};
 let rows = [],
   chart;
 const labels = {
@@ -94,6 +96,7 @@ function authRequired() {
 async function render() {
   // Hapus grafik lama sebelum mengganti halaman. URL tanpa hash membuka beranda.
   chart?.destroy();
+  stopOrbit();
   const [page, id] = (location.hash.slice(1) || "home").split("/");
   try {
     // Halaman akun dan panduan tetap bisa dibuka saat pembacaan laporan gagal.
@@ -169,6 +172,20 @@ async function render() {
         .join(""),
       recentReports: grid(rows.slice(0, 6)),
     });
+    // Orbit barang di hero; dihentikan lagi saat render halaman lain.
+    stopOrbit = startOrbit(document.querySelector("#hero-orbit"));
+    // Pencarian cepat: simpan kata kunci sebagai filter, lalu halaman Cari membacanya.
+    document.querySelectorAll("[data-quick]").forEach(
+      (a) =>
+        (a.onclick = () => {
+          try {
+            localStorage.setItem(
+              "unklab-filters",
+              JSON.stringify({ q: a.dataset.quick }),
+            );
+          } catch {}
+        }),
+    );
   } else if (page === "browse") {
     // Pencarian menggabungkan kata kunci, jenis, kategori, serta status.
     main.innerHTML =
@@ -389,6 +406,15 @@ async function render() {
     }
     main.innerHTML = template("detail", {
       reporterName: esc(reporterName(r)),
+      statusSteps: [
+        ["Dilaporkan", true],
+        ["Terverifikasi", r.status !== "pending"],
+        ["Dikembalikan", r.status === "returned"],
+      ]
+        .map(
+          ([label, done]) => `<li class="${done ? "done" : ""}">${label}</li>`,
+        )
+        .join(""),
       content: card(r),
       content2: heading(labels[r.type], esc(r.title)),
       description: esc(r.description),
@@ -468,7 +494,7 @@ async function render() {
               data: ["pending", "verified", "returned"].map(
                 (s) => visible.filter((r) => r.status === s).length,
               ),
-              backgroundColor: ["#f1bf65", "#324d42", "#b6d0be"],
+              backgroundColor: ["#8c8cff", "#1f1fd1", "#141414"],
               borderWidth: 0,
             },
           ],
